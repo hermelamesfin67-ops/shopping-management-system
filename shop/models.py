@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
 
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     ROLE_CHOICES = [
@@ -67,7 +68,7 @@ class CartItem(models.Model):
                 fields=['cart', 'product'],
                 name='unique_cart_product'
             )]
-        
+
         models.CheckConstraint(
             condition=Q(quantity__gt=0),
             name='quantity_greater_than_zero'
@@ -75,3 +76,81 @@ class CartItem(models.Model):
 
     def __str__(self):
         return self.product
+
+
+class Order(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='orders')
+    STATUS_CHOICE = [
+        
+            ("pending", "Pending"),
+           ( "confirmed", "Confirmed"),
+            ("canceled", "Canceled"),
+            ("shipped", "Shipped"),
+            ("delivered", "Delivered"),
+        
+
+    ]
+    status = models.CharField(
+        max_length=200, choices=STATUS_CHOICE, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    total_price = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return self.user
+
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return self.product
+
+
+class Payment(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('successful', 'Successful'),
+        ('failed', 'Failed'),
+    ]
+
+    order = models.OneToOneField(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='payment'
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    transaction_id = models.CharField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )

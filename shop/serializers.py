@@ -1,5 +1,15 @@
 from rest_framework import serializers
-from .models import Product, Category, Cart, User, CartItem
+from .models import Product, Category, Cart, User, CartItem,Order,OrderItem
+
+class UserSerializer(serializers.ModelSerializer):
+    role=serializers.CharField(read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'role', 'created_at', 'updated_at','username','password']
+        read_only_fields = ['id', 'email', 'role', 'created_at', 'updated_at']
+        extra_kwargs = {"password": {"write_only": True}}
+
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -37,7 +47,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['id', 'cart', 'product', 'quantity']
-        read_only_fields = ['id']
+        read_only_fields = ['id','cart']
 
     def validate_quantity(self, value):
         if value < 1:
@@ -51,4 +61,13 @@ class CartItemSerializer(serializers.ModelSerializer):
         if quantity > product.stock:
             raise serializers.ValidationError({"quantity":f"Stock is only {product.stock} item are available"})
         return attrs
-    
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'created_at', 'updated_at', 'total_price', 'status']
+        read_only_fields = ['id',"user", 'created_at', 'updated_at', 'total_price', 'status']
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'product', 'quantity', 'price']
+        read_only_fields = ['id', 'order', 'product', 'quantity', 'price']
