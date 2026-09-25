@@ -31,7 +31,8 @@ SECRET_KEY = 'django-insecure-e@zfyk)%%rk+^@%%)g0@sgc^hmntt*5bp)w7dwvvbm!vme*w0)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['https://shopping-management-system-production.up.railway.app/',
+                 'http://127.0.0.1:8000/', '127.0.0.1']
 
 
 # Application definition
@@ -79,7 +80,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'shoppingProjects.urls'
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3100",                 
+    "https://shopping-system-beta.vercel.app",       # Live production frontend
+]
 
 TEMPLATES = [
     {
