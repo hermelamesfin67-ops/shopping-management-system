@@ -83,7 +83,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'shoppingProjects.urls'
-CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3100",                 
     "https://shopping-system-beta.vercel.app",       ]
