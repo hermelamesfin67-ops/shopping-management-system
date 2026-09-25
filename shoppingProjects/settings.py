@@ -31,9 +31,11 @@ SECRET_KEY = 'django-insecure-e@zfyk)%%rk+^@%%)g0@sgc^hmntt*5bp)w7dwvvbm!vme*w0)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://shopping-management-system-production.up.railway.app/',
-                 'http://127.0.0.1:8000/', '127.0.0.1']
-
+ALLOWED_HOSTS = [
+    "shopping-management-system-production.up.railway.app",
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
@@ -46,10 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'corsheaders',
 
     'shop',
     'rest_framework',
-    'corsheaders'
 
 ]
 SIMPLE_JWT = {
@@ -70,9 +72,10 @@ REST_FRAMEWORK = {
 }
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -83,8 +86,7 @@ ROOT_URLCONF = 'shoppingProjects.urls'
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3100",                 
-    "https://shopping-system-beta.vercel.app",       # Live production frontend
-]
+    "https://shopping-system-beta.vercel.app",       ]
 
 TEMPLATES = [
     {
