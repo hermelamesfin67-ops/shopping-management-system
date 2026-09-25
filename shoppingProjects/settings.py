@@ -10,13 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from datetime import timedelta
 import cloudinary
 from pathlib import Path
 import dj_database_url
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'shop',
     'rest_framework',
+    'corsheaders'
 
 ]
 SIMPLE_JWT = {
@@ -67,6 +68,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.exception_handler.custom_exception_handler',
 }
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,6 +79,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'shoppingProjects.urls'
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
@@ -103,6 +106,7 @@ DATABASES = {
     'default': dj_database_url.parse
     (os.environ.get('DATABASE_URL'))
 }
+CHAPA_SECRET_KEY = os.getenv("CHAPA_SECRET_KEY").strip()
 CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),

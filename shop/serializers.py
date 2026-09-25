@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Category, Cart, User, CartItem,Order,OrderItem
+from .models import Product, Category, Cart, User, CartItem,Order,OrderItem,Payment
 
 class UserSerializer(serializers.ModelSerializer):
     role=serializers.CharField(read_only=True)
@@ -46,7 +46,7 @@ class CartSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['id', 'cart', 'product', 'quantity']
+        fields = ['id', 'cart_id', 'product', 'quantity']
         read_only_fields = ['id','cart']
 
     def validate_quantity(self, value):
@@ -71,3 +71,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'order', 'product', 'quantity', 'price']
         read_only_fields = ['id', 'order', 'product', 'quantity', 'price']
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['id', 'order', 'created_at', 'updated_at', 'amount', 'status', 'transaction_id','tx_ref']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'amount', 'status','tx_ref', 'transaction_id']

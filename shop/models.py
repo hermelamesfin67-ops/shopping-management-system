@@ -82,13 +82,13 @@ class Order(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='orders')
     STATUS_CHOICE = [
-        
-            ("pending", "Pending"),
-           ( "confirmed", "Confirmed"),
-            ("canceled", "Canceled"),
-            ("shipped", "Shipped"),
-            ("delivered", "Delivered"),
-        
+
+        ("pending", "Pending"),
+        ("confirmed", "Confirmed"),
+        ("canceled", "Canceled"),
+        ("shipped", "Shipped"),
+        ("delivered", "Delivered"),
+
 
     ]
     status = models.CharField(
@@ -100,7 +100,6 @@ class Order(models.Model):
 
     def __str__(self):
         return self.user
-
 
 
 class OrderItem(models.Model):
@@ -140,7 +139,10 @@ class Payment(models.Model):
         null=True,
         blank=True
     )
-
+    tx_ref = models.CharField(
+        max_length=255,
+        unique=True
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -154,3 +156,6 @@ class Payment(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+
+    def __str__(self):
+        return f"Payment for Order #{self.order.id}"

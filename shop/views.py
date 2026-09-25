@@ -1,11 +1,11 @@
-from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models import Category, Product, Cart, CartItem
+from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, PaymentSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .service import add_to_cart, checkout
+from .service import add_to_cart, checkout, create_payment
 
 
 class CategoryListCReateView(ListCreateAPIView):
@@ -56,6 +56,25 @@ class CheckoutView(APIView):
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
+class PaymentCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        order_id = request.data.get('order')
+        try:
+            order = Order.objects.get(id=order_id, user=request.user)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        payment,data = create_payment(order)
+        serializer = PaymentSerializer(payment)
+        return Response(
+            {
+                "payment": serializer.data,
+                "checkout_url": data["data"]["checkout_url"]
+            },
+            status=status.HTTP_201_CREATED
+        )
+
 class CartListCreateView(ListCreateAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
@@ -64,3 +83,8 @@ class CartListCreateView(ListCreateAPIView):
 class CartView(RetrieveUpdateDestroyAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
+
+class CartItemListView(ListAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
