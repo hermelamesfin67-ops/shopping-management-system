@@ -1,11 +1,53 @@
-from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, PaymentSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
-from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment
+from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, PaymentSerializer, MyTokenObtainSerializer, UserSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment, User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from .permisions import IsSuperUser
 from .service import add_to_cart, checkout, create_payment
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsSuperUser]
+
+
+class UserCreateView(CreateAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsSuperUser]
+
+
+class UserDetail(RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsSuperUser]
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete()
+        return Response(
+            {"message": "User deleted successfully"},
+            status=204
+        )
+
+
+class UserProfileView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
+
+class MyLogin(TokenObtainPairView):
+
+    serializer_class = MyTokenObtainSerializer
 
 
 class CategoryListCReateView(ListCreateAPIView):
@@ -65,7 +107,7 @@ class PaymentCreateView(APIView):
             order = Order.objects.get(id=order_id, user=request.user)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-        payment,data = create_payment(order)
+        payment, data = create_payment(order)
         serializer = PaymentSerializer(payment)
         return Response(
             {
@@ -74,6 +116,7 @@ class PaymentCreateView(APIView):
             },
             status=status.HTTP_201_CREATED
         )
+
 
 class CartListCreateView(ListCreateAPIView):
     queryset = Cart.objects.all()
